@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta name="viewport" content="user-scalable=no">
+    <link rel="stylesheet"
+          href="https://production-4gnv3qeqb070546b-1312154413.tcloudbaseapp.com/newyear2/css/style.css"/>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: black;
+            user-select: none;
+            margin: 0;
+        }
+
+        .city {
+            width: 100%;
+            position: fixed;
+            bottom: 0px;
+            z-index: 100;
+        }
+
+        .tips {
+            z-index: 200;
+            position: absolute;
+            right: 1%;
+            bottom: 1%;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 18px;
+        }
+
+        .city img {
+            width: 100%;
+        }
+
+        audio {
+            opacity: 0;
+            font-family: 新宋体;
+        }
+
+        .shape {
+            z-index: 9999 !important;
+        }
+
+        .username {
+            width: 90%;
+            overflow: hidden;
+            position: fixed;
+            left: 50%;
+            top: 40%;
+            transform: translate(-50%, 0);
+            font-size: 100px;
+            z-index: 100;
+            color: #fff;
+            text-align: center;
+            font-family: 'Courier New', Courier, monospace, '微软雅黑';
+            text-shadow: 3px 3px 5px rgba(255, 255, 255, 1);
+        }
+    </style>
+    <title>2023新年快乐</title>
+</head>
+
+<body onselectstart="return false">
+<canvas id="cas" style="background-color: rgba(0, 5, 24, 1); z-index: 9999">
+    浏览器不支持canvas
+</canvas>
+<div class="username"></div>
+<!--   <div class="tips">点击屏幕加音效</div>-->
+<div class="city">
+    <img src="https://production-4gnv3qeqb070546b-1312154413.tcloudbaseapp.com/newyear2/img/city.png" alt=""/>
+</div>
+<script>
+    const query = new URLSearchParams(location.search)
+    const preview = query.get('p')
+    let data = query.get("data");
+    try {
+        data = JSON.parse(decodeURIComponent(data)) || {};
+    } catch (err) {
+        console.log("err", err);
+        data = {};
+    }
+    //data=data
+
+    const initData = {
+        text: '',
+        textColor: 'ffffff',
+        shapes: [
+            {
+                type: 'text',
+                value: '蔡蔡老师'
+            },
+            {
+                type: 'text',
+                value: '请听我朗诵'
+            },
+            {
+                type: 'text',
+                value: '<甘雨传·岩王帝君爱上我>',
+                size: 60
+            },
+            {
+                type: 'text',
+                value: '她本是上古仙兽麒麟'
+            },
+            {
+                type: 'text',
+                value: '被岩王帝君选为妃'
+            },
+            {
+                type: 'text',
+                value: '自从来到四中后'
+            },
+            {
+                type: 'text',
+                value: '灵力尽失'
+            },
+            {
+                type: 'text',
+                value: '归为凡间女子'
+            },
+            {
+                type: 'text',
+                value: '为了不让她恢复仙力'
+            },
+            {
+                type: 'text',
+                value: '早日融入四中生活'
+            },
+            {
+                type: 'text',
+                value: '忘记红尘往事'
+            },
+            {
+                type: 'text',
+                value: '今晚我们需要为她'
+            },
+            {
+                type: 'text',
+                value: '<庆生>',
+                size: 200
+            },
+        ],
+        imgs: ['./1.jpg'],
+        bgi: ''
+    }
+
+    const opt = Object.assign({}, initData, data)
+
+    // greeting转成shapes(String->Array)
+    if (opt.greeting) {
+        opt.shapes = opt.greeting.split(/\n+/).filter(item => item.length > 0)
+    }
+
+
+    // 增加文字出现几率
+    // opt.shapes.push(...opt.shapes);
+    // opt.shapes = opt.shapes.map(item => {
+    //     if (typeof item === 'string') {
+    //         const [name, ext] = item.split('.')
+    //         return {
+    //             type: item.startsWith('data:image') || /png|jpe?g|gif|webp/.test(ext) ? 'image' : 'text',
+    //             value: item
+    //         }
+    //     }
+    //     return item;
+    // });
+    // console.log('opt', opt)
+
+    // 把imgs写入shapes
+    const imgs = opt.imgs.map((item, idx) => {
+        if (item.startsWith('http')) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", item, true);
+            xhr.responseType = "arraybuffer";
+            xhr.onload = function () {
+
+                var img = new Blob([new Int8Array(xhr.response)]);
+
+                // 第二种方法 二进制文件中只包含图片 图片文件转换为base64
+                const reader = new FileReader()
+                reader.readAsDataURL(img);
+                reader.onload = function () {
+                    imgs[idx].value = reader.result;
+                    console.log('opt.shapes', opt.shapes)
+                }
+            }
+            xhr.send()
+        }
+        return {type: 'image', value: item}
+    })
+    opt.shapes.push(...imgs)
+
+    const $username = document.querySelector('.username');
+    $username.innerHTML = opt.text;
+    $username.style.color = "#" + opt.textColor;
+
+
+</script>
+<script
+        src="./fire.js"></script>
+<script
+        src="./index.js"></script>
+</body>
+
+</html>
