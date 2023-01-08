@@ -16,6 +16,7 @@ const backgroundPlayer = new Audio()
 const backgroundStartPlayer = new Audio()
 backgroundPlayer.src = host + 'shengri.mp3'
 backgroundPlayer.src = host + 'shengri.mp3'
+backgroundPlayer.loop = true;
 backgroundStartPlayer.src = host + 'Luv Letter.mp3'
 boomPlayer.src = host + 'boom.mp3'
 firePlayer.src = host + 'fire.mp3'
@@ -171,7 +172,7 @@ canvas.onclick = function () {
     var newTime = new Date().getTime();
     var x = event ? event.clientX : getRandom(0,canvas.width);
     var y = event ? event.clientY : getRandom(0,canvas.height);
-    var random = newTime - shapesTime < 3000 || shapesTime === null || shapesNumber > shapes.length;
+    var random =  newTime - shapesTime < 3000 || shapesTime === null || shapesNumber > shapes.length;
     if (random) {
         var bigboom = new Boom(
             getRandom(canvas.width / 3, (canvas.width * 2) / 3),
@@ -196,15 +197,28 @@ canvas.onclick = function () {
             shapes[shapesNumber]
         );
         if (shapesNumber === 12) {
-            backgroundStartPlayer.pause();
-        }
-        if (shapesNumber === 13) {
-            backgroundPlayer.play();
-            setInterval(() => {
-                canvas.onclick()
-            }, 300)
+           setTimeout(()=>{
+               backgroundStartPlayer.pause();
+               backgroundPlayer.play();
+               let numx = 0;
+
+               let x = setInterval(() => {
+                   canvas.onclick();
+                   numx++;
+                   if(numx === 50){
+                       timestamp = 300;
+                       window.clearInterval(x);
+                       setInterval(()=>{
+                           canvas.onclick();
+                       },300)
+                   }
+               }, 100)
+           },1000)
         }
         shapesNumber++;
+        if(shapesNumber > shapes.length){
+            shapesNumber = 0
+        }
         shapesTime = newTime;
         bigbooms.push(bigboom);
     }
