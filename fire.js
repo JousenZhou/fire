@@ -9,15 +9,16 @@ var bigbooms = [];
 const host = './'
 const shapes = opt.shapes;
 let shapesNumber = 0;
-console.log(shapes);
 const boomPlayer = new Audio()
-const firePlayer = new Audio()
+const firePlayer = new Audio();
+firePlayer.load()
 const backgroundPlayer = new Audio()
 const backgroundStartPlayer = new Audio()
 backgroundPlayer.src = host + 'shengri.mp3'
 backgroundPlayer.src = host + 'shengri.mp3'
 backgroundPlayer.loop = true;
 backgroundStartPlayer.src = host + 'Luv Letter.mp3'
+backgroundStartPlayer.loop = true;
 boomPlayer.src = host + 'boom.mp3'
 firePlayer.src = host + 'fire.mp3'
 const $bgi = new Image()
@@ -43,6 +44,8 @@ function initAnimate() {
 var lastTime;
 
 function animate() {
+    drawMoon();
+
     ctx.save();
     ctx.fillStyle = "rgba(0,5,24,0.1)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -52,8 +55,6 @@ function animate() {
     stars.foreach(function () {
         this.paint();
     });
-    drawMoon();
-
     // if (newTime - lastTime > 3000 + (window.innerHeight - 767) / 2) {
     //     var random = Math.random() * 100 > 80 ? true : false;
     //     var x = getRandom(canvas.width / 5, (canvas.width * 4) / 5);
@@ -108,11 +109,9 @@ function animate() {
     raf(animate);
 }
 
+const moon = new Image();
+moon.src = host + 'moon.png';
 function drawMoon() {
-    // var moon = document.getElementById("moon");
-
-    const moon = new Image()
-    moon.src = host + 'moon.png'
     var centerX = canvas.width - 200,
         centerY = 100,
         width = 80;
@@ -164,15 +163,16 @@ var raf =
 // shapes时间
 let shapesTime = null;
 let startMusic = false;
+let loop = false;
 canvas.onclick = function () {
     if (startMusic === false) {
         backgroundStartPlayer.play()
         startMusic = true;
     }
     var newTime = new Date().getTime();
-    var x = event ? event.clientX : getRandom(0,canvas.width);
-    var y = event ? event.clientY : getRandom(0,canvas.height);
-    var random =  newTime - shapesTime < 3000 || shapesTime === null || shapesNumber > shapes.length;
+    var x = event ? event.clientX : getRandom(0, canvas.width);
+    var y = event ? event.clientY : getRandom(0, canvas.height);
+    var random = newTime - shapesTime < 3000 || shapesTime === null || shapesNumber > shapes.length;
     if (random) {
         var bigboom = new Boom(
             getRandom(canvas.width / 3, (canvas.width * 2) / 3),
@@ -196,29 +196,28 @@ canvas.onclick = function () {
             },
             shapes[shapesNumber]
         );
-        if (shapesNumber === 12) {
-           setTimeout(()=>{
-               backgroundStartPlayer.pause();
-               backgroundPlayer.play();
-               let numx = 0;
+        if (shapesNumber === 12 && !loop) {
+            loop = true;
+            setTimeout(() => {
+                backgroundStartPlayer.pause();
+                backgroundPlayer.play();
+                let numx = 0;
 
-               let x = setInterval(() => {
-                   canvas.onclick();
-                   numx++;
-                   if(numx === 50){
-                       timestamp = 300;
-                       window.clearInterval(x);
-                       setInterval(()=>{
-                           canvas.onclick();
-                       },300)
-                   }
-               }, 100)
-           },1000)
+                let x = setInterval(() => {
+                    canvas.onclick();
+                    numx++;
+                    if (numx === 50) {
+                        timestamp = 300;
+                        window.clearInterval(x);
+                        setInterval(() => {
+                            canvas.onclick();
+                        }, 300)
+                    }
+                }, 100)
+            }, 1000)
         }
         shapesNumber++;
-        if(shapesNumber > shapes.length){
-            shapesNumber = 0
-        }
+        if (shapesNumber > shapes.length) shapesNumber = 0
         shapesTime = newTime;
         bigbooms.push(bigboom);
     }
